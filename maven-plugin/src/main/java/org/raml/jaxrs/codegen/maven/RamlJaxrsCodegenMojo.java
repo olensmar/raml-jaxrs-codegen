@@ -170,6 +170,7 @@ public class RamlJaxrsCodegenMojo extends AbstractMojo
         }
         catch (final Exception e)
         {
+            e.printStackTrace();
             throw new MojoExecutionException("Error generating Java classes from: " + currentSourcePath, e);
         }
     }
