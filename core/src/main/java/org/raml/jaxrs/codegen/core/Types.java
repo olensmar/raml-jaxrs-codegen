@@ -31,6 +31,7 @@ import static org.raml.jaxrs.codegen.core.Names.buildNestedSchemaName;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -98,11 +99,25 @@ public class Types
         {
             return getGeneratorType(String.class);
         }
-        else
+        else if( isCharacterType( mimeType ))
         {
             // fallback to a generic reader
             return getGeneratorType(Reader.class);
         }
+        else
+        {
+            // fallback to a generic reader
+            return getGeneratorType(InputStream.class);
+        }
+    }
+
+    private boolean isCharacterType(MimeType mimeType) {
+        return mimeType.getType().contains( "javascript") ||
+                mimeType.getType().contains( "text") ||
+                mimeType.getType().contains( "json") ||
+                mimeType.getType().contains( "xml") ||
+                mimeType.getType().contains( "yaml") ||
+                mimeType.getType().contains( "raml");
     }
 
     public JType getResponseEntityClass(final MimeType mimeType) throws IOException

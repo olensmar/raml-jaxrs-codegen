@@ -226,21 +226,7 @@ public class Generator
                                               final boolean returnsVoid,
                                               final JDefinedClass resourceInterface) throws Exception
     {
-        if (returnsVoid)
-        {
-            return types.getGeneratorType(void.class);
-        }
-        else
-        {
-            return createResourceMethodReturnType(methodName, action, resourceInterface);
-        }
-    }
 
-    private JDefinedClass createResourceMethodReturnType(final String methodName,
-                                                         final Action action,
-                                                         final JDefinedClass resourceInterface)
-        throws Exception
-    {
         final JDefinedClass responseClass = resourceInterface._class(capitalize(methodName) + "Response")
             ._extends(context.getResponseWrapperType());
 
@@ -248,12 +234,14 @@ public class Generator
         responseClassConstructor.param(javax.ws.rs.core.Response.class, "delegate");
         responseClassConstructor.body().invoke("super").arg(JExpr.ref("delegate"));
 
-        for (final Entry<String, Response> statusCodeAndResponse : action.getResponses().entrySet())
-        {
-            createResponseBuilderInResourceMethodReturnType(action, responseClass, statusCodeAndResponse);
+        if( !returnsVoid) {
+            for (final Entry<String, Response> statusCodeAndResponse : action.getResponses().entrySet()) {
+                createResponseBuilderInResourceMethodReturnType(action, responseClass, statusCodeAndResponse);
+            }
         }
 
-        createGenericResponseBuilderInResourceMethodReturnType( responseClass );
+        createGenericResponseBuilderInResourceMethodReturnType( responseClass, false );
+        createGenericResponseBuilderInResourceMethodReturnType( responseClass, true );
 
         return responseClass;
     }
@@ -369,7 +357,7 @@ public class Generator
         responseBuilderMethodBody._return(JExpr._new(responseClass).arg(builderVariable.invoke("build")));
     }
 
-    private void createGenericResponseBuilderInResourceMethodReturnType(final JDefinedClass responseClass )
+    private void createGenericResponseBuilderInResourceMethodReturnType(final JDefinedClass responseClass, boolean includeEntity )
             throws Exception
     {
         final String responseBuilderMethodName = GENERIC_RESPONSE_METHOD_NAME;
@@ -383,14 +371,17 @@ public class Generator
                 .arg( JExpr.ref("status"));
 
         responseBuilderMethod.param( context.getCodeModel().parseType( "int" ), "status");
-        responseBuilderMethod.param( context.getGeneratorType(StreamingOutput.class), GENERIC_PAYLOAD_ARGUMENT_NAME);
+        if( includeEntity )
+            responseBuilderMethod.param( context.getGeneratorType(StreamingOutput.class), GENERIC_PAYLOAD_ARGUMENT_NAME);
 
         final JBlock responseBuilderMethodBody = responseBuilderMethod.body();
-
         final JVar builderVariable = responseBuilderMethodBody.decl(
                 types.getGeneratorType(ResponseBuilder.class), "responseBuilder", builderArgument);
-        responseBuilderMethodBody.invoke(builderVariable, GENERIC_PAYLOAD_ARGUMENT_NAME).arg(
-                JExpr.ref(GENERIC_PAYLOAD_ARGUMENT_NAME));
+
+        if( includeEntity ) {
+            responseBuilderMethodBody.invoke(builderVariable, GENERIC_PAYLOAD_ARGUMENT_NAME).arg(
+                    JExpr.ref(GENERIC_PAYLOAD_ARGUMENT_NAME));
+        }
 
         responseBuilderMethodBody._return(JExpr._new(responseClass).arg(builderVariable.invoke("build")));
     }
