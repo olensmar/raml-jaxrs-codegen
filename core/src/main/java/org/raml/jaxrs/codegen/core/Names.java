@@ -77,8 +77,25 @@ public class Names
     public static String buildResponseMethodName(final int statusCode, final MimeType mimeType)
     {
         final String status = EnglishReasonPhraseCatalog.INSTANCE.getReason(statusCode, DEFAULT_LOCALE);
-        return uncapitalize(getShortMimeType(mimeType)
-                            + buildJavaFriendlyName(defaultIfBlank(status, "_" + statusCode)));
+
+        String mimeName = getShortMimeType(mimeType);
+        StringBuffer buffer = new StringBuffer();
+        boolean capitalize = false;
+        for( int c = 0; c < mimeName.length(); c++ )
+        {
+            char ch = mimeName.charAt(c);
+            if(!Character.isLetterOrDigit(ch) )
+                capitalize = buffer.length() == 0 ? false : true;
+            else
+            {
+                buffer.append( capitalize ? Character.toUpperCase(ch) : ch );
+                capitalize = false;
+            }
+        }
+
+        mimeName = buffer.toString();
+
+        return uncapitalize(mimeName + buildJavaFriendlyName(defaultIfBlank(status, "_" + statusCode)));
     }
 
     public static String buildNestedSchemaName(final MimeType mimeType)
