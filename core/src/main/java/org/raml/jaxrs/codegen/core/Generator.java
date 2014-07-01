@@ -24,6 +24,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.math.NumberUtils;
 import org.raml.model.*;
+import org.raml.model.Response;
 import org.raml.model.parameter.*;
 import org.raml.parser.rule.ValidationResult;
 import org.raml.parser.visitor.RamlDocumentBuilder;
@@ -37,11 +38,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.ws.rs.*;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.StreamingOutput;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -204,7 +202,9 @@ public class Generator
         // the actually created unique method name should be needed in the previous method but
         // no way of doing this :(
         final JMethod method = context.createResourceMethod(resourceInterface, methodName,
-            resourceMethodReturnType);
+               context.getGeneratorType(javax.ws.rs.core.Response.class));
+
+//            resourceMethodReturnType);
 
         context.addHttpMethodAnnotation(action.getType().toString(), method);
 

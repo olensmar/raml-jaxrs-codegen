@@ -112,12 +112,13 @@ public class Types
     }
 
     private boolean isCharacterType(MimeType mimeType) {
-        return mimeType.getType().contains( "javascript") ||
+        return mimeType != null && mimeType.getType() != null &&
+                (mimeType.getType().contains( "javascript") ||
                 mimeType.getType().contains( "text") ||
                 mimeType.getType().contains( "json") ||
                 mimeType.getType().contains( "xml") ||
                 mimeType.getType().contains( "yaml") ||
-                mimeType.getType().contains( "raml");
+                mimeType.getType().contains( "raml"));
     }
 
     public JType getResponseEntityClass(final MimeType mimeType) throws IOException
