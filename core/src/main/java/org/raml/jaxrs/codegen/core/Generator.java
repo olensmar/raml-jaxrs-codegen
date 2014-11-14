@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.mail.internet.MimeMultipart;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -213,6 +214,11 @@ public class Generator
         addProducesAnnotation(uniqueResponseMimeTypes, method);
 
         final JDocComment javadoc = addBaseJavaDoc(action, method);
+
+        if( context.getConfiguration().isAddRequestContext()) {
+            JVar param = method.param(HttpServletRequest.class, "request");
+            param.annotate(javax.ws.rs.core.Context.class);
+        }
 
         addPathParameters(action, method, javadoc);
         addHeaderParameters(action, method, javadoc);

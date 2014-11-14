@@ -90,6 +90,12 @@ public class RamlJaxrsCodegenMojo extends AbstractMojo
     private boolean useJsr303Annotations;
 
     /**
+     * Should @Context be added to all JAX-RS interface method calls
+     */
+    @Parameter(property = "addRequestContext", defaultValue = "false")
+    private boolean addRequestContext;
+
+    /**
      * Whether to empty the output directory before generation occurs, to clear out all source files
      * that have been generated previously.
      */
@@ -146,6 +152,7 @@ public class RamlJaxrsCodegenMojo extends AbstractMojo
             configuration.setJaxrsVersion(JaxrsVersion.fromAlias(jaxrsVersion));
             configuration.setOutputDirectory(outputDirectory);
             configuration.setUseJsr303Annotations(useJsr303Annotations);
+            configuration.setAddRequestContext(addRequestContext);
             configuration.setJsonMapper(AnnotationStyle.valueOf(jsonMapper.toUpperCase()));
         }
         catch (final Exception e)
